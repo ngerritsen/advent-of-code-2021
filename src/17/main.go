@@ -10,8 +10,8 @@ import (
 //go:embed input.txt
 var input string
 
-type Target struct{ min, max Coord }
-type Coord struct{ x, y int }
+type target struct{ min, max coord }
+type coord struct{ x, y int }
 
 func main() {
 	t := parseTarget(input)
@@ -21,7 +21,7 @@ func main() {
 	println(hits)
 }
 
-func getMaxY(t Target) (int, int) {
+func getMaxY(t target) (int, int) {
 	my := math.MinInt
 	hits := 0
 
@@ -42,7 +42,7 @@ func getMaxY(t Target) (int, int) {
 	return my, hits
 }
 
-func getMinVx(t Target) int {
+func getMinVx(t target) int {
 	vx, dx := 0, 0
 
 	for dx < t.min.x {
@@ -53,8 +53,8 @@ func getMinVx(t Target) int {
 	return vx
 }
 
-func simulate(t Target, vx, vy int) int {
-	my, c := 0, Coord{0, 0}
+func simulate(t target, vx, vy int) int {
+	my, c := 0, coord{0, 0}
 
 	for !pastTarget(t, c) {
 		c.x += vx
@@ -78,22 +78,22 @@ func simulate(t Target, vx, vy int) int {
 	return math.MinInt
 }
 
-func pastTarget(t Target, c Coord) bool {
+func pastTarget(t target, c coord) bool {
 	return c.x > t.max.x || c.y < t.min.y
 }
 
-func hitTarget(t Target, c Coord) bool {
+func hitTarget(t target, c coord) bool {
 	return c.x <= t.max.x && c.x >= t.min.x && c.y <= t.max.y && c.y >= t.min.y
 }
 
-func parseTarget(input string) Target {
+func parseTarget(input string) target {
 	re := regexp.MustCompile(`(-?\d+)(?:\.{2})(-?\d+)`)
 	res := re.FindAllStringSubmatch(input, 4)
 	x, y := res[0], res[1]
 
-	return Target{
-		min: Coord{x: toInt(x[1]), y: toInt(y[1])},
-		max: Coord{x: toInt(x[2]), y: toInt(y[2])},
+	return target{
+		min: coord{x: toInt(x[1]), y: toInt(y[1])},
+		max: coord{x: toInt(x[2]), y: toInt(y[2])},
 	}
 }
 
