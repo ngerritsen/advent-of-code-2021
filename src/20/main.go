@@ -29,6 +29,29 @@ func main() {
 	println(img.enhance(50).crop().lit())
 }
 
+func getBounds(size int) (int, int) {
+	e, s := size/2, size/-2
+
+	return s, e
+}
+
+func (img image) lit() int {
+	return len(img.pixels)
+}
+
+func (img image) crop() image {
+	s, e := getBounds(img.size)
+	px := make(pixels)
+
+	for p := range img.pixels {
+		if p.x >= s && p.x <= e && p.y >= s && p.y <= e {
+			px.add(p)
+		}
+	}
+
+	return image{px, img.alg, img.size}
+}
+
 func (img image) enhance(n int) image {
 	px := make(pixels)
 	s, e := getBounds(img.size + (n * 3))
@@ -72,6 +95,12 @@ func (img image) isLit(c coord) bool {
 	return img.alg.has(int(val))
 }
 
+func (px pixels) has(c coord) bool { return px[c] }
+func (px pixels) add(c coord)      { px[c] = true }
+
+func (alg algorithm) has(n int) bool { return alg[n] }
+func (alg algorithm) add(n int)      { alg[n] = true }
+
 func parseInput(input string) image {
 	parts := strings.Split(input, "\n\n")
 	px, size := parsePixels(parts[1])
@@ -106,33 +135,4 @@ func parseAlgorithm(input string) algorithm {
 	}
 
 	return alg
-}
-
-func getBounds(size int) (int, int) {
-	e, s := size/2, size/-2
-
-	return s, e
-}
-
-func (px pixels) has(c coord) bool { return px[c] }
-func (px pixels) add(c coord)      { px[c] = true }
-
-func (alg algorithm) has(n int) bool { return alg[n] }
-func (alg algorithm) add(n int)      { alg[n] = true }
-
-func (img image) lit() int {
-	return len(img.pixels)
-}
-
-func (img image) crop() image {
-	s, e := getBounds(img.size)
-	px := make(pixels)
-
-	for p := range img.pixels {
-		if p.x >= s && p.x <= e && p.y >= s && p.y <= e {
-			px.add(p)
-		}
-	}
-
-	return image{px, img.alg, img.size}
 }
